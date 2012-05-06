@@ -1,0 +1,13 @@
+{
+  "author": "Kristjan Reinloo",
+  "name": "cote-server",
+  "description": "Server for COTE",
+  "version": "0.0.1",
+  "main": "cote-server.js",
+  "dependencies": { "nano" : "*", "socket.io" : "*" },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
