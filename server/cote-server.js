@@ -17,16 +17,11 @@ function Cote () {
 
 	this.connectHandler = function (socket, data) {
 		util.log("connect: " + JSON.stringify(data));
-		var id, rev;
-		if (data !== null) {
-			if (data.id !== null) {
-				id = data.id;
-			}
-			if (data.rev !== null) {
-				rev = data.rev;
-			}
+		var id;
+		if (data !== null && data.id !== null) {
+			id = data.id;
 		}
-		if (id && rev) {
+		if (id) {
 			var doc = docs[id];
 			if (doc === undefined) {
 				docs[id] = new Array();
@@ -62,7 +57,7 @@ function Cote () {
 	};
 
 	this.createHandler = function (socket, data) {
-		if (data.body === undefined || data === "") {
+		if (data.body === undefined || data.body === "") {
 			return;
 		}
 		if (data.title === undefined) {
@@ -75,9 +70,9 @@ function Cote () {
 			if (!err) {
 				util.log(socket.id + " created new document" + " (id = " + body.id +
 					" rev = " + body.rev + ")");
-				socket.emit (DOC.CREATE, body);
 				docs[body.id] = new Array();
 				docs[body.id].push(socket);
+				socket.emit (DOC.CREATE, body);
 			}
 			else {
 				console.log(JSON.stringify(err));
@@ -120,7 +115,24 @@ function Cote () {
 			return;
 		}
 		util.log("saveHandler called");
-
+		db.get(data.id, function (err, res) {
+			if (!err) {
+				db.insert({
+					_id : res._id,
+					_rev : res._rev,
+					title : data.title,
+					body : data.body
+				}, function (err, res) {
+					if (!err) {
+						console.log(JSON.stringify(res));
+					}
+				});
+				var editors = docs[res._id];
+				for (var i = 0; i < editors.length; i++) {
+					editors[i].emit(DOC.SAVE, {});
+				}
+			}
+		});
 	};
 
 };

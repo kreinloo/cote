@@ -4,7 +4,6 @@ var cote = {
 	port : "8001",
 	socket : null,
 	doc : null,
-	caretPos : null,
 
 	getDocParams : function () {
 		var hash = window.location.hash;
@@ -12,32 +11,18 @@ var cote = {
 			return null;
 		}
 		else {
-			var docID, docRev;
-			docID = docRev = null;
+			var docID;
 			var attrs = hash.split("#");
 			if (attrs[1]) {
-				var idList = attrs[1].split("=");
-				if (idList.length == 2) {
-					docID = idList[1];
-				}
+				docID = attrs[1];
 			}
-			if (attrs[2]) {
-				var revList = attrs[2].split("=");
-				if (revList.length == 2) {
-					docRev = revList[1];
-				}
-			}
+			return { id : docID };
 		}
-		if (docID && docRev) {
-			return { id : docID, rev : docRev };
-		}
-		else {
-			return null;
-		}
+		return null;
 	},
 
-	saveDocParams : function (id, rev) {
-		window.location.hash = "id=" + id + "#rev=" + rev;
+	saveDocParams : function (id) {
+		window.location.hash = id;
 	},
 
 	connect : function (args) {
@@ -48,11 +33,12 @@ var cote = {
 
 	addListeners : function () {
 		var self = this;
+
 		this.socket.on (DOC.CREATE, function (data) {
 			console.log(data);
 			if (data.id !== undefined) {
 				self.doc = data.id;
-				self.saveDocParams(data.id, data.rev);
+				self.saveDocParams(data.id);
 			}
 		});
 
@@ -60,13 +46,14 @@ var cote = {
 			console.log(data);
 			self.updateHandler(data);
 		});
-
+/*
 		this.socket.on (DOC.DELETE, function (data) {
 			console.log(data);
 		});
-
+*/
 		this.socket.on (DOC.SAVE, function (data) {
 			console.log(data);
+			self.saveHandler(data);
 		});
 	},
 
@@ -93,7 +80,7 @@ var cote = {
 		}
 		else {
 			this.socket.emit(DOC.SAVE, {
-				id : doc,
+				id : this.doc,
 				title : title,
 				body : body
 			});
@@ -116,10 +103,23 @@ var cote = {
 			$("#doc-title").val(data.title);
 		}
 		if (data.body !== undefined) {
-			this.caretPos = $("#doc-body").caret();
+			var caretPos = $("#doc-body").caret();
 			$("#doc-body").val(data.body);
-			$("#doc-body").caret(this.caretPos);
+			$("#doc-body").caret(caretPos);
 		}
+	},
+
+	saveHandler : function (data) {
+		console.log("adding message!");
+		var msg_id = Math.random().toString().slice(2);
+		$(".msg-area").append(
+			$("<div>")
+				.addClass("alert")
+				.addClass("alert-success")
+				.attr("id", msg_id)
+				.append("<b>Document saved!</b>")
+		);
+		setTimeout(function () {$("#" + msg_id).remove()}, 3000);
 	}
 
 };
