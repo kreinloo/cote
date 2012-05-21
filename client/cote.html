@@ -5,19 +5,19 @@
 
 	<link href="css/bootstrap.min.css" rel="stylesheet"/>
 	<link href="css/custom.css" rel="stylesheet"/>
-	<!--
-	<link href="css/darkstrap.css" rel="stylesheet"/>
-	<script type="text/javascript" src="js/lib/jquery.couch.js"></script>
-	-->
+
 	<script type="text/javascript" src="js/lib/jquery-1.7.2.min.js"></script>
-	<script type="text/javascript" src="js/lib/socket.io.js"></script>
-	<script type="text/javascript" src="http://localhost/db/_utils/script/jquery.couch.js"></script>
+	<script type="text/javascript" src="js/lib/socket.io.min.js"></script>
+	<script type="text/javascript" src="js/lib/jquery.couch.js"></script>
+	<script type="text/javascript" src="js/lib/jquery.caret.js"></script>
+	<script type="text/javascript" src="js/lib/jquery.textarea.js"></script>
+
+	<script type="text/javascript" src="js/document.js"></script>
+	<script type="text/javascript" src="js/ui.js"></script>
+
 	<script type="text/javascript" src="js/cote.js"></script>
 	<script type="text/javascript" src="js/events.js"></script>
 
-	<script type="text/javascript" src="http://teddevito.com/demos/js/jquery.textarea.js"></script>
-	<script type="text/javascript"
-		src="http://code.accursoft.com/caret/raw/af6136af8c46/jquery.caret.js"></script>
 
 </head>
 <body>
@@ -38,9 +38,12 @@
 
 	<div class="row">
 		<div class="span12 top">
-			<label>Title:</label>
-			<input type="text" id="doc-title"/>
-			<textarea class="span12" id="doc-body" rows="30"></textarea>
+			<h1 class="page-header">Collaborative Online Text Editor</h1>
+			Title: <input type="text" id="doc-title"/><br/>
+			Author: <input type="text" id="doc-author"/>
+			Created at:  <input type="text" id="doc-created_at" readonly="readonly"/>
+			Updated at: <input type="text" id="doc-updated_at" readonly="readonly"/>
+			<textarea class="span12" id="doc-content" rows="30"></textarea>
 			<br/>
 			<button class="btn btn-primary" id="btn-save">Save</button>
 

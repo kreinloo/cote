@@ -8,6 +8,10 @@ textarea {
 	font-family: monospace;
 }
 
+input {
+	font-family: monospace;
+}
+
 .editors {
 	height: 400px;
 	margin-top: 20px;

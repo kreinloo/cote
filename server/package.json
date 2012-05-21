@@ -4,10 +4,13 @@
   "description": "Server for COTE",
   "version": "0.0.1",
   "main": "cote-server.js",
-  "dependencies": { "nano" : "*", "socket.io" : "*" },
+  "dependencies": {
+    "nano" : "2.1.0",
+    "socket.io" : ">= 0.9.5"
+  },
   "devDependencies": {},
   "optionalDependencies": {},
   "engines": {
-    "node": "*"
+    "node": ">= 0.6.16"
   }
 }

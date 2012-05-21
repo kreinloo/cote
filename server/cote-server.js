@@ -1,7 +1,15 @@
-var io = require("socket.io").listen(8001);
+/*
+
+	- if title is edited, nothing happens
+
+	- if user uses arrows, updates are sent
+
+
+*/
+var io = require("socket.io").listen(8002);
 var util = require("util");
 var nano = require("nano")("http://localhost:5984");
-require("../client/js/events.js");
+var events = require("../client/js/events.js");
 
 io.configure(function () {
 	io.set ("log level", 2);
@@ -95,6 +103,7 @@ function Cote () {
 		var editor;
 		for (var i = 0; i < editors.length; i++) {
 			editor = editors[i];
+			if (editor === socket) { continue; }
 			editor.emit(DOC.UPDATE, data);
 			util.log("sending update to " + editor.id);
 		}
@@ -114,7 +123,6 @@ function Cote () {
 		if (data.id === undefined) {
 			return;
 		}
-		util.log("saveHandler called");
 		db.get(data.id, function (err, res) {
 			if (!err) {
 				db.insert({
