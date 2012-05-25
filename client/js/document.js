@@ -46,15 +46,23 @@ function Document () {
   };
 
   this.contentHandler = function (data) {
-    //console.log ("content handler called");
     var content = data.split ("\n");
 
-    if (_content)
+    var len = _content.length > content.length ? _content.length : content.length;
+    for (var i = 0; i < len; i++) {
+      if (_content[i] !== content[i]) {
 
-    if (_content.length !== content.length) {
-      console.log ("we have changes " + _content.length + " " + content.length);
+        if (content[i] !== undefined) {
+          _content[i] = content[i];
+          console.log("line (" + i + "): " + _content[i]);
+        }
+        else {
+          _content.splice (i, 1);
+          console.log("deleted line " + i);
+          console.log (_content);
+        }
+      }
     }
-    _content = content;
 
   };
 
