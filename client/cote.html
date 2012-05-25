@@ -3,21 +3,22 @@
 <head>
 	<title>COTE</title>
 
-	<link href="css/bootstrap.min.css" rel="stylesheet"/>
-	<link href="css/custom.css" rel="stylesheet"/>
+	<link href="css/bs.min.css" rel="stylesheet" type="text/css"/>
+	<link href="css/custom.css" rel="stylesheet" type="text/css"/>
+
+	<link href="css/jquery-linedtextarea.css" rel="stylesheet" type="text/css"/>
 
 	<script type="text/javascript" src="js/lib/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="js/lib/socket.io.min.js"></script>
 	<script type="text/javascript" src="js/lib/jquery.couch.js"></script>
 	<script type="text/javascript" src="js/lib/jquery.caret.js"></script>
 	<script type="text/javascript" src="js/lib/jquery.textarea.js"></script>
-
-	<script type="text/javascript" src="js/document.js"></script>
-	<script type="text/javascript" src="js/ui.js"></script>
+	<script type="text/javascript" src="js/lib/jquery-linedtextarea.js"></script>
 
 	<script type="text/javascript" src="js/cote.js"></script>
+	<script type="text/javascript" src="js/document.js"></script>
+	<script type="text/javascript" src="js/ui.js"></script>
 	<script type="text/javascript" src="js/events.js"></script>
-
 
 </head>
 <body>
@@ -25,7 +26,7 @@
 <div class="navbar navbar-fixed-top">
 	<div class="navbar-inner">
 		<div class="container">
-			<a class="brand" href="#">COTE</a>
+			<span class="brand">Collaborative Online Text Editor</span>
 			<ul class="nav pull-right">
 				<li><a>About</a></li>
 				<li><a>Contact</a></li>
@@ -37,21 +38,32 @@
 <div class="container">
 
 	<div class="row">
-		<div class="span12 top">
-			<h1 class="page-header">Collaborative Online Text Editor</h1>
-			Title: <input type="text" id="doc-title"/><br/>
-			Author: <input type="text" id="doc-author"/>
-			Created at:  <input type="text" id="doc-created_at" readonly="readonly"/>
-			Updated at: <input type="text" id="doc-updated_at" readonly="readonly"/>
-			<textarea class="span12" id="doc-content" rows="30"></textarea>
+		<div class="span9 top div-doc">
+			<label>Title:</label>
+			<input type="text" id="doc-title"/><br/>
+			<textarea id="doc-content" rows="30" class="lined"></textarea>
 			<br/>
 			<button class="btn btn-primary" id="btn-save">Save</button>
 
+			Author: <input type="text" id="doc-author"/>
+			Created at:  <input type="text" id="doc-created_at" readonly="readonly"/>
+			Updated at: <input type="text" id="doc-updated_at" readonly="readonly"/>
+		</div>
+
+		<div class="span3 top div-info">
+			<div class="chat-history">
+				<p class="chat-history-msg">hello</p>
+				<p class="chat-history-msg">hello</p>
+			</div>
+			<input type="text" class="chat-input">
+			<button class="btn" id="chat-send">Send</button>
+			<button class="btn" id="chat-change-nick">Change nick</button>
+			<button class="btn" ic="chat-clear-history">Clear history</button>
 		</div>
 	</div>
 
 	<div class="row">
-		<div class="msg-area span12"></div>
+		<div class="msg-area"></div>
 	</div>
 
 </div>

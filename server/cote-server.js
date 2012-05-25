@@ -65,18 +65,16 @@ function Cote () {
 	};
 
 	this.createHandler = function (socket, data) {
-		if (data.body === undefined || data.body === "") {
+		console.log (JSON.stringify (data));
+		if (data.content === undefined) {
 			return;
-		}
-		if (data.title === undefined) {
-			data.title = "";
 		}
 		db.insert({
 			title : data.title,
-			body : data.body
+			content : data.content
 		}, function (err, body) {
 			if (!err) {
-				util.log(socket.id + " created new document" + " (id = " + body.id +
+				util.log(socket.id + " created new doc" + " (id = " + body.id +
 					" rev = " + body.rev + ")");
 				docs[body.id] = new Array();
 				docs[body.id].push(socket);
@@ -170,6 +168,10 @@ io.sockets.on ("connection", function (socket) {
 
 	socket.on (DOC.OPEN, function (data) {
 		cote.openHandler(socket, data);
+	});
+
+	socket.on (DOC.AUTHOR, function (data) {
+		console.log(DOC.AUTHOR + " " + data);
 	});
 
 	socket.on ("disconnect", function () {

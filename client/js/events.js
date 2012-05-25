@@ -1,15 +1,17 @@
 CLIENT = {
-	CONNECT : 0x00006
+  CONNECT : 0x00006
 };
 
 DOC = {
-	CREATE : 0x00001,
-	UPDATE : 0x00002,
-	DELETE : 0x00003,
-	SAVE   : 0x00004,
-	OPEN   : 0x00005
+  CREATE : 0x00001,
+  UPDATE : 0x00002,
+  DELETE : 0x00003,
+  SAVE   : 0x00004,
+  OPEN   : 0x00005,
+
+  AUTHOR : 0x00007
 };
 
 if (typeof module !== "undefined") {
-	module.exports.DOC = DOC;
+  module.exports.DOC = DOC;
 }
