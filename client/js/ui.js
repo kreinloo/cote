@@ -19,6 +19,9 @@ var COTE = (function (C) {
     var _updated_at = $("#doc-updated_at");
     var _save_button = $("#btn-save");
 
+    var _chat_input = $("#chat-input");
+    var _chat_send = $("#chat-send");
+
     var _doc = doc;
 
     this.setID = function (id) {
@@ -31,14 +34,28 @@ var COTE = (function (C) {
 
     this.setTitle = function (title) {
       _title.val (title);
-    }
+    };
 
     this.setAuthor = function (author) {
       _author.val (author);
     };
 
     this.setContent = function (content) {
-      _content.val (content);
+      var caret = _content.caret ();
+      var substr1 = _content.val().substr (0, caret);
+      var substr2 = content.substr (0, caret);
+      if (substr1 === substr2) {
+        //console.log("s1 eq s2");
+        _content.val (content);
+        _content.caret (caret);
+      }
+      else {
+        var diff = _content.val().length - content.length;
+        //console.log("diff: " + Math.abs(diff));
+        _content.val (content);
+        _content.caret (caret - diff);
+      }
+
     };
 
     this.setCreatedAt = function (created_at) {
@@ -61,6 +78,15 @@ var COTE = (function (C) {
       setTimeout(function () { $("#" + msg_id).remove() }, 3000);
     };
 
+    this.addChatMessage = function (data) {
+      $(".chat-history").append(
+        $("<p>")
+          .addClass("chat-history-msg")
+          .append("<i>" + new Date().toLocaleString().split(" ")[4] +
+            "</i> <b>" + data.author + ": </b>" + data.msg)
+      );
+    };
+
     _author.keyup (function (e) {
       _doc.authorHandler (_author.val ());
     });
@@ -75,6 +101,20 @@ var COTE = (function (C) {
 
     _save_button.click (function (e) {
       _doc.saveButtonHandler ();
+    });
+
+    _chat_input.keyup (function (e) {
+      if (e.keyCode === 13 && _chat_input.val () !== "") {
+        COTE.sendChatMessage (_chat_input.val ());
+        _chat_input.val ("");
+      }
+    });
+
+    _chat_send.click (function (e) {
+      if (_chat_input.val () !== "") {
+        COTE.sendChatMessage (_chat_input.val ());
+        _chat_input.val ("");
+      }
     });
 
   }

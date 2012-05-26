@@ -6,6 +6,7 @@
 */
 var io     = require("socket.io").listen(8002);
 var util   = require("util");
+var gdiff  = require("googlediff");
 var nano   = require("nano")("http://localhost:5984");
 var events = require("../client/js/events.js");
 
@@ -19,9 +20,11 @@ function Cote () {
 
   var docs = {};
   var self = this;
+  var patcher = new gdiff ();
 
   this.connectHandler = function (socket, data) {
     util.log("connect: " + JSON.stringify(data));
+    socket.emit (CLIENT.NAME, "editor-" + String(socket.id).substr(0, 5));
     var id;
     if (data !== null && data.id !== null) {
       id = data.id;
@@ -88,12 +91,13 @@ function Cote () {
   this.updateHandler = function (socket, data) {
 
     util.log("update from " + socket.id);
-    util.log(JSON.stringify(data));
-
     if (data.id === undefined) {
       util.log("data id is undefined");
       return;
     }
+
+    var i, editors;
+    editors = docs[data.id].editors;
 
     if (data.type === "title") {
       docs[data.id].doc.title = data.value;
@@ -102,23 +106,16 @@ function Cote () {
       docs[data.id].doc.author = data.value;
     }
     else if (data.type === "content") {
+      var content = docs[data.id].doc.content;
+      content = patcher.patch_apply (data.value, content)[0];
+      docs[data.id].doc.content = content;
+    }
+    for (i = 0; i < editors.length; i++) {
+      if (editors[i] === socket) { continue; }
+      editors[i].emit (DOC.UPDATE, data);
+    }
+    util.log ("updates sent");
 
-    }
-
-    /*
-    var editors = docs[data.id];
-    if (editors === undefined || editors instanceof Array !== true) {
-      util.log("no editors");
-      return;
-    }
-    var editor;
-    for (var i = 0; i < editors.length; i++) {
-      editor = editors[i];
-      if (editor === socket) { continue; }
-      editor.emit(DOC.UPDATE, data);
-      util.log("sent update to " + editor.id);
-    }
-    */
   };
 
   this.saveHandler = function (socket, data) {
@@ -143,6 +140,17 @@ function Cote () {
     });
   };
 
+  this.chatHandler = function (socket, data) {
+    console.log (JSON.stringify (data));
+    var id = data.id;
+    if (docs[id] === undefined) { return; }
+    var editors = docs[id].editors;
+    for (var i = 0; i < editors.length; i++) {
+      if (socket.id === editors[i].id) { continue; }
+      editors[i].emit (CHAT.MESSAGE, data);
+    }
+  };
+
 };
 
 var cote = new Cote();
@@ -163,6 +171,10 @@ io.sockets.on ("connection", function (socket) {
 
   socket.on (DOC.SAVE, function (data) {
     cote.saveHandler(socket, data);
+  });
+
+  socket.on (CHAT.MESSAGE, function (data) {
+    cote.chatHandler (socket, data);
   });
 
   socket.on ("disconnect", function () {

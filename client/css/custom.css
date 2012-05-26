@@ -1,56 +1,88 @@
 .top {
-	margin-top: 60px;
+  margin-top: 60px;
 }
 
 textarea {
-	background-color: #fefefe;
-	height: 400px;
-	font-family: monospace;
-	border: none;
-	box-shadow: none;
-	width: 99%;
+  background-color: #fafafa;
+  height: 400px;
+  font-family: monospace;
+  border: none;
+  box-shadow: none;
+  width: 99%;
+}
+
+textarea:focus {
+  box-shadow: none;
 }
 
 input {
-	font-family: monospace;
+  font-family: monospace;
 }
 
 .editors {
-	height: 400px;
-	margin-top: 20px;
-	border-radius: 3px;
-	border: 1px solid #f0f0f0;
-	float: right;
+  height: 400px;
+  margin-top: 20px;
+  border-radius: 3px;
+  border: 1px solid #f0f0f0;
+  float: right;
 }
 
 .msg-area {
-	margin-top: 15px;
+  margin-top: 15px;
 }
 
 .div-doc {
-	background-color: #f0f0f0;
+  /*background-color: #f0f0f0;*/
 }
 
 .div-info {
-	background-color: #f0f0f0;
-	height: 575px;
+  /*background-color: #f0f0f0;*/
+  height: 575px;
 }
 
 .chat-input {
-	width: 96%;
+  width: 96%;
+  margin-top: 1px;
 }
 
 .chat-history {
-	width: 100%;
-	height: 88%;
-	background-color: #cecece;
+  width: 100%;
+  height: 88%;
+  /*background-color: #cecece;*/
+  border: 1px solid silver;
+  word-wrap: break-word;
+  overflow: auto;
 }
 
 .chat-history-msg {
-	padding: 2px;
-	margin-bottom: 2px;
+  padding: 2px;
+  margin-bottom: 2px;
 }
 
 .linedwrap {
-	padding: 0px;
+  padding: 0px;
+  width: 100%;
+}
+
+table {
+  border: 1px solid silver;
+}
+
+table th {
+  text-align: left;
+  width: 100px;
+}
+
+table input[readonly]{
+  background-color: white;
+}
+
+.metadata {
+  width: 100%;
+  margin-top: 10px;
+  padding: 5px;
+}
+
+table input {
+  width: 400px;
 }

@@ -3,11 +3,12 @@
 <head>
   <title>COTE</title>
 
-  <link href="css/bs.min.css" rel="stylesheet" type="text/css"/>
+  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
   <link href="css/jquery-linedtextarea.css" rel="stylesheet" type="text/css"/>
   <link href="css/custom.css" rel="stylesheet" type="text/css"/>
 
   <script type="text/javascript" src="js/lib/socket.io.min.js"></script>
+  <script type="text/javascript" src="js/lib/diff_match_patch.js"></script>
   <script type="text/javascript" src="js/lib/jquery-1.7.2.min.js"></script>
   <script type="text/javascript" src="js/lib/jquery.couch.js"></script>
   <script type="text/javascript" src="js/lib/jquery.caret.js"></script>
@@ -38,23 +39,37 @@
 
   <div class="row">
     <div class="span9 top div-doc">
-      <label>Title:</label>
-      <input type="text" id="doc-title"/><br/>
-      <textarea id="doc-content" rows="30" class="lined"></textarea>
+      <textarea id="doc-content" class="lined"></textarea>
       <br/>
-      <button class="btn btn-primary" id="btn-save">Save</button>
+      <button class="btn btn-primary" id="btn-save">Save now</button>
 
-      Author: <input type="text" id="doc-author"/>
-      Created at:  <input type="text" id="doc-created_at" readonly="readonly"/>
-      Updated at: <input type="text" id="doc-updated_at" readonly="readonly"/>
+      <table class="metadata">
+        <tr>
+          <th>Title</th>
+          <td><input type="text" id="doc-title"/><br/></td>
+        </tr>
+        <tr>
+          <th>Author(s)</th>
+          <td><input type="text" id="doc-author"/></td>
+        </tr>
+        <tr>
+          <th>Created at</th>
+          <td>
+            <input type="text" id="doc-created_at" readonly="readonly"/>
+          </td>
+        </tr>
+        <tr>
+          <th>Updated at</th>
+          <td>
+            <input type="text" id="doc-updated_at" readonly="readonly"/>
+          </td>
+        </tr>
+      </table>
     </div>
 
     <div class="span3 top div-info">
-      <div class="chat-history">
-        <p class="chat-history-msg">hello</p>
-        <p class="chat-history-msg">hello</p>
-      </div>
-      <input type="text" class="chat-input">
+      <div class="chat-history"></div>
+      <input type="text" class="chat-input" id="chat-input">
       <button class="btn" id="chat-send">Send</button>
       <button class="btn" id="chat-change-nick">Change nick</button>
       <button class="btn" ic="chat-clear-history">Clear history</button>

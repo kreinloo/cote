@@ -10,6 +10,7 @@ var COTE = (function (C) {
   C.port = "8002";
   C.socket = null;
   C.docID = null;
+  C.editorName = null;
 
   C.getDocParams = function () {
     var hash = window.location.hash;
@@ -49,17 +50,17 @@ var COTE = (function (C) {
       self.docID = data._id;
       self.saveDocParams (data._id);
       self.ui.popupMessage ("Document created!");
-      C.doc.init (data);
+      self.doc.init (data);
     });
 
     C.socket.on (DOC.INIT, function (data) {
       console.log ("recv: DOC.INIT " + JSON.stringify (data));
-      C.doc.init (data);
+      self.doc.init (data);
     });
 
     C.socket.on (DOC.UPDATE, function (data) {
       console.log ("recv: DOC.UPDATE " + JSON.stringify (data));
-      C.doc.serverUpdate (data);
+      self.doc.serverUpdate (data);
     });
 
     C.socket.on (DOC.SAVE, function (data) {
@@ -67,6 +68,17 @@ var COTE = (function (C) {
       self.ui.popupMessage ("Document saved");
       self.ui.setUpdatedAt ( data.timestamp );
     });
+
+    C.socket.on (CLIENT.NAME, function (data) {
+      console.log ("recv: " + CLIENT.NAME + " " + data);
+      self.editorName = data;
+    });
+
+    C.socket.on (CHAT.MESSAGE, function (data) {
+      console.log ("recv: " + CHAT.MESSAGE + " " + data);
+      self.ui.addChatMessage (data);
+    });
+
   };
 
   C.init = function () {
@@ -90,6 +102,13 @@ var COTE = (function (C) {
       }
     }
   };
+
+  C.sendChatMessage = function (data) {
+    C.send (CHAT.MESSAGE, { author : C.editorName, msg : data });
+    C.ui.addChatMessage ({ author : C.editorName, msg : data });
+  }
+
+  C.patcher = new diff_match_patch ();
 
   return C;
 
