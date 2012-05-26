@@ -9,7 +9,7 @@ var COTE = (function (C) {
   C.url  = "http://cote.ahju.eu";
   C.port = "8002";
   C.socket = null;
-  C.doc = null;
+  C.docID = null;
 
   C.getDocParams = function () {
     var hash = window.location.hash;
@@ -45,22 +45,28 @@ var COTE = (function (C) {
     var self = C;
 
     C.socket.on (DOC.CREATE, function (data) {
-      console.log ("recv: DOC.CREATE" + JSON.stringify (data));
-      self.doc = data.id;
-      self.saveDocParams (data.id);
+      console.log ("recv: DOC.CREATE " + JSON.stringify (data));
+      self.docID = data._id;
+      self.saveDocParams (data._id);
+      self.ui.popupMessage ("Document created!");
+      C.doc.init (data);
+    });
+
+    C.socket.on (DOC.INIT, function (data) {
+      console.log ("recv: DOC.INIT " + JSON.stringify (data));
+      C.doc.init (data);
     });
 
     C.socket.on (DOC.UPDATE, function (data) {
-      //self.updateHandler(data);
+      console.log ("recv: DOC.UPDATE " + JSON.stringify (data));
+      C.doc.serverUpdate (data);
     });
 
     C.socket.on (DOC.SAVE, function (data) {
-      //self.saveHandler(data);
+      console.log ("recv: DOC.SAVE " + JSON.stringify (data));
+      self.ui.popupMessage ("Document saved");
+      self.ui.setUpdatedAt ( data.timestamp );
     });
-  };
-
-  C.createDoc = function (data) {
-    C.socket.emit (DOC.CREATE, data);
   };
 
   C.init = function () {
@@ -68,14 +74,15 @@ var COTE = (function (C) {
     console.log("connecting to server ...");
     C.connect(params);
     if (params !== null) {
-      C.doc = params.id;
+      C.docID = params.id;
     }
   };
 
   C.send = function (ev, data) {
-    if (C.socket !== undefined && C.doc !== null) {
+    if (C.socket !== undefined && C.docID !== null) {
+      data.id = C.docID;
       C.socket.emit (ev, data);
-      console.log ("sent: " + ev + " " + data);
+      console.log ("sent:" + JSON.stringify (data));
     } else {
       if (ev === DOC.CREATE) {
         C.socket.emit (ev, data);
@@ -83,20 +90,6 @@ var COTE = (function (C) {
       }
     }
   };
-
-/*
-    saveHandler : function (data) {
-      var msg_id = Math.random().toString().slice(2);
-      $(".msg-area").append(
-        $("<div>")
-          .addClass("alert")
-          .addClass("alert-success")
-          .attr("id", msg_id)
-          .append("<b>Document saved!</b>")
-      );
-      setTimeout(function () { $("#" + msg_id).remove() }, 3000);
-    }
-*/
 
   return C;
 
@@ -107,9 +100,9 @@ $(document).ready(function () {
   $("#doc-content").tabby();
   $("#doc-content").linedtextarea ();
 
-  var doc = new COTE.Document ();
-  var ui = new COTE.UI (doc);
-  doc.setUI (ui);
+  COTE.doc = new COTE.Document ();
+  COTE.ui = new COTE.UI (COTE.doc);
+  COTE.doc.setUI (COTE.ui);
   COTE.init();
 
 });

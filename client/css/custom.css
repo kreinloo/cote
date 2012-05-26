@@ -8,7 +8,7 @@ textarea {
 	font-family: monospace;
 	border: none;
 	box-shadow: none;
-	width: 100%;
+	width: 99%;
 }
 
 input {
@@ -49,4 +49,8 @@ input {
 .chat-history-msg {
 	padding: 2px;
 	margin-bottom: 2px;
+}
+
+.linedwrap {
+	padding: 0px;
 }

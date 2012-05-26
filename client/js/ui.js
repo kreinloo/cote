@@ -49,6 +49,18 @@ var COTE = (function (C) {
       _updated_at.val (updated_at);
     };
 
+    this.popupMessage = function (msg) {
+      var msg_id = Math.random().toString().slice(2);
+      $(".msg-area").append(
+        $("<div>")
+          .addClass("alert")
+          .addClass("alert-success")
+          .attr("id", msg_id)
+          .append("<b>" + msg + "</b>")
+      );
+      setTimeout(function () { $("#" + msg_id).remove() }, 3000);
+    };
+
     _author.keyup (function (e) {
       _doc.authorHandler (_author.val ());
     });
@@ -58,7 +70,7 @@ var COTE = (function (C) {
     });
 
     _content.keyup (function (e) {
-      _doc.contentHandler (_content.val ());
+      _doc.contentHandler (_content.val (), e);
     });
 
     _save_button.click (function (e) {

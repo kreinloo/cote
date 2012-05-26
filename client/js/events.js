@@ -3,6 +3,7 @@ CLIENT = {
 };
 
 DOC = {
+  INIT   : 0x00008,
   CREATE : 0x00001,
   UPDATE : 0x00002,
   DELETE : 0x00003,
