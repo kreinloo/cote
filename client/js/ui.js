@@ -21,8 +21,12 @@ var COTE = (function (C) {
 
     var _chat_input = $("#chat-input");
     var _chat_send = $("#chat-send");
+    var _chat_clear_history = $("#chat-clear-history");
 
     var _doc = doc;
+    var _caret_line = null;
+
+    var self = this;
 
     this.setID = function (id) {
       _id.val (id);
@@ -68,10 +72,11 @@ var COTE = (function (C) {
 
     this.popupMessage = function (msg) {
       var msg_id = Math.random().toString().slice(2);
-      $(".msg-area").append(
+      $("html").append(
         $("<div>")
           .addClass("alert")
           .addClass("alert-success")
+          .addClass("popup")
           .attr("id", msg_id)
           .append("<b>" + msg + "</b>")
       );
@@ -85,6 +90,32 @@ var COTE = (function (C) {
           .append("<i>" + new Date().toLocaleString().split(" ")[4] +
             "</i> <b>" + data.author + ": </b>" + data.msg)
       );
+    $(".chat-history").scrollTop($(".chat-history").
+      prop("scrollHeight"));
+    };
+
+    this.highlightLine = function () {
+      var caret = _content.caret ();
+      var slices = _content.val().split("\n");
+      var count = 0;
+      var i = 0;
+      while (count <= caret) {
+        if (slices[i] === "") {
+          count += 1;
+        }
+        else {
+          count += slices[i].length+1;
+        }
+        i++;
+        if (slices[i] === undefined) { break; }
+      }
+      if (_caret_line != null) {
+        _caret_line.toggleClass("selected-line");
+        _caret_line.toggleClass("lineno");
+      }
+      _caret_line = $( $(".lineno")[i-1] );
+      _caret_line.toggleClass("selected-line");
+      _caret_line.toggleClass("lineno");
     };
 
     _author.keyup (function (e) {
@@ -97,6 +128,7 @@ var COTE = (function (C) {
 
     _content.keyup (function (e) {
       _doc.contentHandler (_content.val (), e);
+      self.highlightLine ();
     });
 
     _save_button.click (function (e) {
@@ -115,6 +147,11 @@ var COTE = (function (C) {
         COTE.sendChatMessage (_chat_input.val ());
         _chat_input.val ("");
       }
+    });
+
+    _chat_clear_history.click (function (e) {
+      $(".chat-history").children().remove();
+      self.popupMessage ("Chat history cleared!");
     });
 
   }
