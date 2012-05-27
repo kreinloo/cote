@@ -64,7 +64,7 @@ var COTE = (function (C) {
         _content.val (content);
         _content.caret (caret - diff);
       }
-
+      self.highlightLine ();
     };
 
     this.setCreatedAt = function (created_at) {

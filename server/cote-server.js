@@ -1,7 +1,6 @@
 /*
 
-  - if title is edited, nothing happens
-  - if user uses arrows, updates are sent
+  cote-server.js
 
 */
 var io     = require("socket.io").listen(8002);
