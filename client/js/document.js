@@ -56,7 +56,7 @@ var COTE = (function (C) {
 
     this.contentHandler = function (data, e) {
       if (_content === data) { return; }
-      if (!_is_saved) {
+      if (COTE.docID === null) {
         _content = data;
         return;
       }
@@ -66,13 +66,12 @@ var COTE = (function (C) {
     };
 
     this.saveButtonHandler = function () {
-      if (!_is_saved) {
+      if (COTE.docID === null) {
         COTE.send (DOC.CREATE, {
           title : _title,
           author : _author,
           content : _content,
         });
-        _is_saved = true;
       } else {
         COTE.send (DOC.SAVE, { id : _id });
       }

@@ -6,9 +6,9 @@
 
 var COTE = (function (C) {
 
-  C.UI = function (doc) {
+  "use strict";
 
-    "use strict";
+  C.UI = function (doc) {
 
     var _id = $("#doc-id");
     var _rev = $("#doc-rev");
@@ -22,9 +22,14 @@ var COTE = (function (C) {
     var _chat_input = $("#chat-input");
     var _chat_send = $("#chat-send");
     var _chat_clear_history = $("#chat-clear-history");
+    var _rev_history = $("#doc-rev-history");
 
     var _doc = doc;
     var _caret_line = null;
+    var _ctrl_down = false;
+
+    var _dialog_base = null;
+    var _change_nick_base = null;
 
     var self = this;
 
@@ -80,18 +85,24 @@ var COTE = (function (C) {
           .attr("id", msg_id)
           .append("<b>" + msg + "</b>")
       );
-      setTimeout(function () { $("#" + msg_id).remove() }, 3000);
+      setTimeout(function () {
+        $("#" + msg_id).fadeOut (1500, function () {
+          $("#" + msg_id).remove();
+        });
+      }, 2000);
     };
 
     this.addChatMessage = function (data) {
-      $(".chat-history").append(
-        $("<p>")
-          .addClass("chat-history-msg")
-          .append("<i>" + new Date().toLocaleString().split(" ")[4] +
-            "</i> <b>" + data.author + ": </b>" + data.msg)
-      );
-    $(".chat-history").scrollTop($(".chat-history").
-      prop("scrollHeight"));
+      var msg = $("<p>")
+        .addClass("chat-history-msg")
+        .append("<i>" + new Date().toLocaleString().split(" ")[4] +
+          "</i> <b>" + data.author + ": </b>" + data.msg);
+      msg.hide ();
+      $(".chat-history").append(msg);
+      msg.fadeIn (500, function () {
+        $(".chat-history").scrollTop($(".chat-history").
+          prop("scrollHeight"));
+      });
     };
 
     this.highlightLine = function () {
@@ -116,6 +127,47 @@ var COTE = (function (C) {
       _caret_line = $( $(".lineno")[i-1] );
       _caret_line.toggleClass("selected-line");
       _caret_line.toggleClass("lineno");
+    };
+
+    this.revisionDialog = function (revs) {
+      var div = _dialog_base;
+      div.dialog ({
+        title : "Revision history",
+        height : 500,
+        width : 700,
+        resizable : false,
+        modal : true,
+        close : self.cleanupDialog
+      });
+      $("#dialog-header").append (
+        "<p>Revision history for document <b>" + COTE.docID +"</b></p>"
+      );
+      for (var i = 0; i < revs.length; i++) {
+        $("#dialog-select-old").append(
+          $("<option>").append(revs[i])
+        );
+        $("#dialog-select-new").append(
+          $("<option>").append(revs[i])
+        );
+      }
+      $("#dialog-btn-compare").click (function () {
+        var old_rev = $("#dialog-select-old option:selected").val();
+        var new_rev = $("#dialog-select-new option:selected").val();
+        COTE.compareButtonHandler ({old_rev : old_rev, new_rev : new_rev});
+      });
+    };
+
+    this.cleanupDialog = function () {
+      $("#dialog-header").children().remove();
+      $("#dialog-select-old").children().remove();
+      $("#dialog-select-new").children().remove();
+      $("#dialog-diff").children().remove();
+      $("#dialog-btn-compare").off ("click");
+    };
+
+    this.displayDiff = function (data) {
+      $("#dialog-diff").children().remove();
+      $("#dialog-diff").append (data);
     };
 
     _author.keyup (function (e) {
@@ -153,6 +205,61 @@ var COTE = (function (C) {
       $(".chat-history").children().remove();
       self.popupMessage ("Chat history cleared!");
     });
+
+    _rev_history.click (function (e) {
+      COTE.revisionHandler ();
+    });
+
+    $(document).keyup (function (e) {
+      if (e.which === 17) { _ctrl_down = false; }
+    });
+
+    $(document).keydown (function (e) {
+      if (e.which === 17) { _ctrl_down = true; }
+      if (e.which === 83 && _ctrl_down) {
+        _doc.saveButtonHandler ();
+        return false;
+      }
+    });
+
+    $("#chat-change-nick").click (function (e) {
+      var div = _change_nick_base;
+      div.dialog({
+        title : "Change nick",
+        width : 400,
+        height : 250,
+        resizable : false,
+        modal : true,
+        buttons : [
+          {
+            text : "OK",
+            click : function () {
+              if ($("#change-nick-value").val () !== "") {
+                COTE.changeEditorName ($("#change-nick-value").val ());
+                $("#change-nick-value").val ("");
+                $(this).dialog ("close");
+              }
+            }
+          },
+          {
+            text : "Cancel",
+            click : function () {
+              $(this).dialog ("close");
+              $("#change-nick-value").val ("");
+            }
+          }
+        ]
+      });
+    });
+
+    this.loadDialogBase = function () {
+      $.get ("/dialog.html", function (data) {
+        _dialog_base = $(data);
+      });
+      $.get ("/change_nick.html", function (data) {
+        _change_nick_base = $(data);
+      });
+    }();
 
   }
 

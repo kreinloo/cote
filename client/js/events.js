@@ -1,5 +1,5 @@
 CLIENT = {
-  CONNECT : 0x00006,
+  CONNECT : "CLIENT_CONNECT",
   NAME    : "CLIENT_NAME",
 };
 
@@ -8,13 +8,12 @@ CHAT = {
 }
 
 DOC = {
-  INIT   : 0x00008,
-  CREATE : 0x00001,
-  UPDATE : 0x00002,
-  DELETE : 0x00003,
-  SAVE   : 0x00004,
-  OPEN   : 0x00005,
-  AUTHOR : 0x00007,
+  INIT     : "DOC_INIT",
+  CREATE   : "DOC_CREATE",
+  UPDATE   : "DOC_UPDATE",
+  SAVE     : "DOC_SAVE",
+  REV_INFO : "DOC_REV_INFO",
+  REV_DIFF : "DOC_REV_DIFF"
 };
 
 if (typeof module !== "undefined") {

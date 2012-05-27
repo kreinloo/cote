@@ -79,6 +79,16 @@ var COTE = (function (C) {
       self.ui.addChatMessage (data);
     });
 
+    C.socket.on (DOC.REV_INFO, function (data) {
+      console.log ("recv: " + DOC.REV_INFO + " " + JSON.stringify (data));
+      self.revisionResponseHandler (data);
+    });
+
+    C.socket.on (DOC.REV_DIFF, function (data) {
+      console.log ("recv: " + DOC.REV_DIFF + " " + JSON.stringify (data));
+      self.revDiffResponseHandler (data);
+    });
+
   };
 
   C.init = function () {
@@ -106,6 +116,39 @@ var COTE = (function (C) {
   C.sendChatMessage = function (data) {
     C.send (CHAT.MESSAGE, { author : C.editorName, msg : data });
     C.ui.addChatMessage ({ author : C.editorName, msg : data });
+  };
+
+  C.revisionHandler = function () {
+    if (C.docID === null) { return; }
+    C.requestRevInfo ();
+  };
+
+  C.requestRevInfo = function () {
+    if (C.docID === null) { return; }
+    C.send (DOC.REV_INFO, {});
+  };
+
+  C.revisionResponseHandler = function (data) {
+    var revisions = data;
+    var options = [];
+    for (var r in revisions) {
+      options.push (revisions[r].rev);
+    }
+    console.log (options);
+    C.ui.revisionDialog (options);
+  };
+
+  C.compareButtonHandler = function (revs) {
+    C.send (DOC.REV_DIFF, revs);
+  };
+
+  C.revDiffResponseHandler = function (data) {
+    C.ui.displayDiff (data);
+  };
+
+  C.changeEditorName = function (name) {
+    C.editorName = name;
+    C.ui.popupMessage ("Your name is now " + name);
   }
 
   C.patcher = new diff_match_patch ();

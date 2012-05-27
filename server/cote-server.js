@@ -23,7 +23,7 @@ function Cote () {
   var patcher = new gdiff ();
 
   this.connectHandler = function (socket, data) {
-    util.log("connect: " + JSON.stringify(data));
+    util.log("CLIENT.CONNECT from " + socket.id + " " + JSON.stringify(data));
     socket.emit (CLIENT.NAME, "editor-" + String(socket.id).substr(0, 5));
     var id;
     if (data !== null && data.id !== null) {
@@ -36,7 +36,6 @@ function Cote () {
         docs[id].editors = new Array ();
       }
       docs[id].editors.push(socket);
-      util.log("added " + socket.id + " to editors' array");
 
       if (docs[id].doc === undefined) {
         db.get(id, function (err, res) {
@@ -49,7 +48,6 @@ function Cote () {
       else {
         socket.emit (DOC.INIT, docs[id].doc);
       }
-      util.log("sent doc to " + socket.id);
     }
   };
 
@@ -58,7 +56,7 @@ function Cote () {
       for (var j in docs[i].editors) {
         if (socket === docs[i].editors[j]) {
           docs[i].editors.splice (j, 1);
-          util.log(socket.id + " disconnected");
+          util.log("CLIENT.DISCONNECT from " + socket.id);
           return;
         }
       }
@@ -66,7 +64,7 @@ function Cote () {
   };
 
   this.createHandler = function (socket, data) {
-    console.log ("DOC.CREATE: " + JSON.stringify (data));
+    console.log ("DOC.CREATE from " + socket.id + " " + JSON.stringify (data));
     if (data.content === undefined) {
       return;
     }
@@ -74,7 +72,6 @@ function Cote () {
     db.insert(data, function (err, body) {
       if (!err) {
         db.get (body.id, function (err, res) {
-          util.log (socket.id + " created new doc" + " (id = " + body.id + ")");
           docs[body.id] = {};
           docs[body.id].editors = new Array ();
           docs[body.id].editors.push (socket);
@@ -89,8 +86,7 @@ function Cote () {
   };
 
   this.updateHandler = function (socket, data) {
-
-    util.log("update from " + socket.id);
+    util.log("DOC.UPDATE from " + socket.id);
     if (data.id === undefined) {
       util.log("data id is undefined");
       return;
@@ -114,8 +110,6 @@ function Cote () {
       if (editors[i] === socket) { continue; }
       editors[i].emit (DOC.UPDATE, data);
     }
-    util.log ("updates sent");
-
   };
 
   this.saveHandler = function (socket, data) {
@@ -127,7 +121,7 @@ function Cote () {
     docs[data.id].doc.updated_at = timestamp;
     db.insert (docs[data.id].doc, function (err, res) {
       if (!err) {
-        util.log ("DOC.SAVE: " + socket.id);
+        util.log ("DOC.SAVE request from " + socket.id);
         docs[data.id].doc._rev = res.rev;
         var editors = docs[data.id].editors;
         for (var i = 0; i < editors.length; i++) {
@@ -141,7 +135,8 @@ function Cote () {
   };
 
   this.chatHandler = function (socket, data) {
-    console.log (JSON.stringify (data));
+    util.log ("CHAT.MESSAGE from " + socket.id);
+    //console.log (JSON.stringify (data));
     var id = data.id;
     if (docs[id] === undefined) { return; }
     var editors = docs[id].editors;
@@ -149,6 +144,40 @@ function Cote () {
       if (socket.id === editors[i].id) { continue; }
       editors[i].emit (CHAT.MESSAGE, data);
     }
+  };
+
+  this.revInfoHandler = function (socket, data) {
+    var id = data.id;
+    if (id === null || id === undefined) { return; }
+    db.get (id, { revs_info : true }, function (err, res) {
+      if (!err) {
+        socket.emit (DOC.REV_INFO,  res._revs_info);
+        util.log ("DOC.REV_INFO sent to " + socket.id);
+      }
+      else {
+        util.error (err);
+      }
+    });
+  };
+
+  this.revDiffHandler = function (socket, data) {
+    var id = data.id;
+    if (id === null || id === undefined) { return; }
+    if (data.old_rev === undefined || data.new_rev === undefined) { return; }
+    db.get (id, { rev : data.old_rev }, function (err1, res1) {
+      if (err1) { return; }
+      db.get (id, { rev: data.new_rev }, function (err2, res2) {
+        if (err2) { return; }
+        var text1 = res1.content;
+        var text2 = res2.content;
+        var diffs = patcher.diff_main (text1, text2);
+        patcher.diff_cleanupSemantic (diffs);
+        var response = patcher.diff_prettyHtml (diffs);
+        socket.emit (DOC.REV_DIFF, response);
+        util.log ("DOC.REV_DIFF sent to " + socket.id);
+      })
+    });
+
   };
 
 };
@@ -171,6 +200,14 @@ io.sockets.on ("connection", function (socket) {
 
   socket.on (DOC.SAVE, function (data) {
     cote.saveHandler(socket, data);
+  });
+
+  socket.on (DOC.REV_INFO, function (data) {
+    cote.revInfoHandler (socket, data);
+  });
+
+  socket.on (DOC.REV_DIFF, function (data) {
+    cote.revDiffHandler (socket, data);
   });
 
   socket.on (CHAT.MESSAGE, function (data) {

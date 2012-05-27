@@ -3,13 +3,19 @@
 <head>
   <title>COTE</title>
 
-  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-  <link href="css/jquery-linedtextarea.css" rel="stylesheet" type="text/css"/>
+  <link href="css/lib/bootstrap.min.css"
+    rel="stylesheet" type="text/css"/>
+  <link href="css/lib/jquery-linedtextarea.css"
+    rel="stylesheet" type="text/css"/>
+  <link href="css/lib/flick/jquery-ui-1.8.20.custom.css"
+    rel="stylesheet" type="text/css"/>
   <link href="css/custom.css" rel="stylesheet" type="text/css"/>
 
   <script type="text/javascript" src="js/lib/socket.io.min.js"></script>
   <script type="text/javascript" src="js/lib/diff_match_patch.js"></script>
   <script type="text/javascript" src="js/lib/jquery-1.7.2.min.js"></script>
+  <script
+    type="text/javascript" src="js/lib/jquery-ui-1.8.20.custom.min.js"></script>
   <script type="text/javascript" src="js/lib/jquery.couch.js"></script>
   <script type="text/javascript" src="js/lib/jquery.caret.js"></script>
   <script type="text/javascript" src="js/lib/jquery.textarea.js"></script>
@@ -67,7 +73,10 @@
           </tr>
           <tr>
             <td></td>
-            <td><button class="btn btn-primary" id="btn-save">Save now</button></td>
+            <td>
+              <button class="btn btn-primary" id="btn-save"><b>Save now</b>
+              </button>
+            </td>
           <tr>
         </table>
       </div>
@@ -78,11 +87,15 @@
       <input type="text" class="chat-input" id="chat-input">
       <button class="btn" id="chat-send">Send</button>
       <button class="btn" id="chat-change-nick">Change nick</button>
-      <button class="btn" id="chat-clear-history">Clear history</button>
+      <button class="btn btn-bottom" id="chat-clear-history">Clear history
+      </button>
+      <button class="btn btn-bottom" id="doc-rev-history">Revision history
+      </button>
     </div>
 
   </div>
 
 </div>
+
 </body>
 </html>
