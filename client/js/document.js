@@ -43,13 +43,11 @@ var COTE = (function (C) {
     };
 
     this.authorHandler = function (data) {
-      //console.log ("new auther: " + data);
       _author = data;
       COTE.send (DOC.UPDATE, { type: "author", value : data });
     };
 
     this.titleHandler = function (data) {
-      //console.log ("new title: " + data);
       _title = data;
       COTE.send (DOC.UPDATE, { type: "title", value : data });
     };

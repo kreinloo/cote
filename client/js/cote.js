@@ -75,7 +75,7 @@ var COTE = (function (C) {
     });
 
     C.socket.on (CHAT.MESSAGE, function (data) {
-      console.log ("recv: " + CHAT.MESSAGE + " " + data);
+      console.log ("recv: " + CHAT.MESSAGE + " " + JSON.stringify (data));
       self.ui.addChatMessage (data);
     });
 

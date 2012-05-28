@@ -3,13 +3,14 @@
   cote-server.js
 
 */
-var io     = require("socket.io").listen(8002);
-var util   = require("util");
-var gdiff  = require("googlediff");
-var nano   = require("nano")("http://localhost:5984");
-var events = require("../client/js/events.js");
+var io        = require("socket.io").listen(8002);
+var util      = require("util");
+var gdiff     = require("googlediff");
+var sanitizer = require ("sanitizer");
+var nano      = require("nano")("http://localhost:5984");
+var events    = require("../client/js/events.js");
 
-var db     = nano.use("cote");
+var db        = nano.use("cote");
 
 io.configure(function () {
   io.set ("log level", 2);
@@ -23,7 +24,10 @@ function Cote () {
 
   this.connectHandler = function (socket, data) {
     util.log("CLIENT.CONNECT from " + socket.id + " " + JSON.stringify(data));
-    socket.emit (CLIENT.NAME, "editor-" + String(socket.id).substr(0, 5));
+    var editorName = "editor-" + String(socket.id).substr(0, 5);
+    socket.emit (CLIENT.NAME, editorName);
+    socket.emit (CHAT.MESSAGE, { author : "Server", msg : editorName +
+      " has joined ..."});
     var id;
     if (data !== null && data.id !== null) {
       id = data.id;
@@ -63,7 +67,7 @@ function Cote () {
   };
 
   this.createHandler = function (socket, data) {
-    console.log ("DOC.CREATE from " + socket.id + " " + JSON.stringify (data));
+    util.log ("DOC.CREATE from " + socket.id + " " + JSON.stringify (data));
     if (data.content === undefined) {
       return;
     }
@@ -79,7 +83,7 @@ function Cote () {
         });
       }
       else {
-        console.log(JSON.stringify(err));
+        util.log(JSON.stringify(err));
       }
     })
   };
@@ -87,7 +91,6 @@ function Cote () {
   this.updateHandler = function (socket, data) {
     util.log("DOC.UPDATE from " + socket.id);
     if (data.id === undefined) {
-      util.log("data id is undefined");
       return;
     }
 
@@ -128,16 +131,19 @@ function Cote () {
         }
       }
       else {
-        console.log (err);
+        util.log (err);
       }
     });
   };
 
   this.chatHandler = function (socket, data) {
     util.log ("CHAT.MESSAGE from " + socket.id);
-    //console.log (JSON.stringify (data));
     var id = data.id;
     if (docs[id] === undefined) { return; }
+    if (data.author !== undefined && data.msg !== undefined) {
+      data.author = sanitizer.escape (data.author);
+      data.msg = sanitizer.escape (data.msg);
+    } else { return; }
     var editors = docs[id].editors;
     for (var i = 0; i < editors.length; i++) {
       if (socket.id === editors[i].id) { continue; }

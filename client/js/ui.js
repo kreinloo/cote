@@ -31,6 +31,8 @@ var COTE = (function (C) {
     var _dialog_base = null;
     var _change_nick_base = null;
 
+    var _interval_id = null;
+
     var self = this;
 
     this.setID = function (id) {
@@ -54,13 +56,11 @@ var COTE = (function (C) {
       var substr1 = _content.val().substr (0, caret);
       var substr2 = content.substr (0, caret);
       if (substr1 === substr2) {
-        //console.log("s1 eq s2");
         _content.val (content);
         _content.caret (caret);
       }
       else {
         var diff = _content.val().length - content.length;
-        //console.log("diff: " + Math.abs(diff));
         _content.val (content);
         _content.caret (caret - diff);
       }
@@ -179,8 +179,18 @@ var COTE = (function (C) {
     });
 
     _content.keyup (function (e) {
-      _doc.contentHandler (_content.val (), e);
+      if (e.keyCode === 17) { _ctrl_down = false; }
+      //_doc.contentHandler (_content.val (), e);
       self.highlightLine ();
+      return false;
+    });
+
+    _content.keydown (function (e) {
+      if (e.keyCode === 17) { _ctrl_down = true; }
+      if (e.keyCode === 83 && _ctrl_down) {
+        _doc.saveButtonHandler ();
+        return false;
+      }
     });
 
     _save_button.click (function (e) {
@@ -209,7 +219,7 @@ var COTE = (function (C) {
     _rev_history.click (function (e) {
       COTE.revisionHandler ();
     });
-
+/*
     $(document).keyup (function (e) {
       if (e.which === 17) { _ctrl_down = false; }
     });
@@ -221,7 +231,7 @@ var COTE = (function (C) {
         return false;
       }
     });
-
+*/
     $("#chat-change-nick").click (function (e) {
       var div = _change_nick_base;
       div.dialog({
@@ -260,6 +270,21 @@ var COTE = (function (C) {
         _change_nick_base = $(data);
       });
     }();
+
+    _content.focusin (function () {
+      console.log("focus in");
+      if (_interval_id !== null) { return; }
+      _interval_id = setInterval (function () {
+        _doc.contentHandler (_content.val ());
+        console.log ("update");
+      }, 750);
+    });
+
+    _content.focusout (function () {
+      console.log("focus out");
+      clearInterval (_interval_id);
+      _interval_id = null;
+    });
 
   }
 
