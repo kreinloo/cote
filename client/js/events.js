@@ -13,7 +13,11 @@ DOC = {
   UPDATE   : "DOC_UPDATE",
   SAVE     : "DOC_SAVE",
   REV_INFO : "DOC_REV_INFO",
-  REV_DIFF : "DOC_REV_DIFF"
+  REV_DIFF : "DOC_REV_DIFF",
+
+  ADD_LINE : "DOC_ADD_LINE",
+  DEL_LINE : "DOC_ADD_LINE",
+  MOD_LINE : "DOC_MOD_LINE"
 };
 
 if (typeof module !== "undefined") {

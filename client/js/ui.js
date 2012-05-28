@@ -272,18 +272,23 @@ var COTE = (function (C) {
     }();
 
     _content.focusin (function () {
-      console.log("focus in");
+      //console.log("focus in");
       if (_interval_id !== null) { return; }
       _interval_id = setInterval (function () {
         _doc.contentHandler (_content.val ());
-        console.log ("update");
+        //console.log ("update");
       }, 750);
     });
 
     _content.focusout (function () {
-      console.log("focus out");
+      //console.log("focus out");
       clearInterval (_interval_id);
       _interval_id = null;
+    });
+
+    _content.on ("copy paste cut", function (e) {
+      e.preventDefault ();
+      console.log ("copy || paste || cut detected");
     });
 
   }
