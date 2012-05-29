@@ -6,6 +6,8 @@
 
 var COTE = (function (C) {
 
+  "use strict";
+
   C.url  = "http://cote.ahju.eu";
   C.port = "8002";
   C.socket = null;
@@ -72,6 +74,7 @@ var COTE = (function (C) {
     C.socket.on (CLIENT.NAME, function (data) {
       console.log ("recv: " + CLIENT.NAME + " " + data);
       self.editorName = data;
+      self.ui.setEditorName (data);
     });
 
     C.socket.on (CHAT.MESSAGE, function (data) {
@@ -108,7 +111,7 @@ var COTE = (function (C) {
     } else {
       if (ev === DOC.CREATE) {
         C.socket.emit (ev, data);
-        console.log ("sent: DOC.CREATE " + JSON.stringify(data));
+        //console.log ("sent: DOC.CREATE " + JSON.stringify(data));
       }
     }
   };
@@ -149,7 +152,12 @@ var COTE = (function (C) {
   C.changeEditorName = function (name) {
     C.editorName = name;
     C.ui.popupMessage ("Your name is now " + name);
-  }
+  };
+
+  C.rowCommentHandler = function (row_id) {
+    var rowComment = C.doc.getCommentByRowId (row_id);
+    C.ui.showCommentDialog (row_id, rowComment);
+  };
 
   C.patcher = new diff_match_patch ();
 

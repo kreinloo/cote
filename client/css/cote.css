@@ -2,7 +2,8 @@
   margin-top: 60px;
 }
 
-textarea {
+/*textarea {*/
+#doc-content {
   background-color: #fafafa;
   height: 410px;
   font-family: monospace;
@@ -115,4 +116,9 @@ table input {
 
 select {
   margin-top: 9px;
+}
+
+#row-comment {
+  width: 430px;
+  font-family: monospace;
 }

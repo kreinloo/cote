@@ -28,10 +28,13 @@ var COTE = (function (C) {
     var _caret_line = null;
     var _ctrl_down = false;
 
-    var _dialog_base = null;
+    var _rev_dialog_base = null;
     var _change_nick_base = null;
+    var _row_comment_base = null;
 
     var _interval_id = null;
+
+    var _keyCode = null;
 
     var self = this;
 
@@ -65,6 +68,10 @@ var COTE = (function (C) {
         _content.caret (caret - diff);
       }
       self.highlightLine ();
+    };
+
+    this.getContent = function () {
+      return _content.val ();
     };
 
     this.setCreatedAt = function (created_at) {
@@ -120,7 +127,7 @@ var COTE = (function (C) {
         i++;
         if (slices[i] === undefined) { break; }
       }
-      if (_caret_line != null) {
+      if (_caret_line !== null) {
         _caret_line.toggleClass("selected-line");
         _caret_line.toggleClass("lineno");
       }
@@ -130,15 +137,22 @@ var COTE = (function (C) {
     };
 
     this.revisionDialog = function (revs) {
-      var div = _dialog_base;
+      var div = _rev_dialog_base;
       div.dialog ({
         title : "Revision history",
         height : 500,
         width : 700,
         resizable : false,
         modal : true,
-        close : self.cleanupDialog
+        close : function () {
+          $("#dialog-header").children().remove();
+          $("#dialog-select-old").children().remove();
+          $("#dialog-select-new").children().remove();
+          $("#dialog-diff").children().remove();
+          $("#dialog-btn-compare").off ("click");
+        }
       });
+
       $("#dialog-header").append (
         "<p>Revision history for document <b>" + COTE.docID +"</b></p>"
       );
@@ -157,14 +171,6 @@ var COTE = (function (C) {
       });
     };
 
-    this.cleanupDialog = function () {
-      $("#dialog-header").children().remove();
-      $("#dialog-select-old").children().remove();
-      $("#dialog-select-new").children().remove();
-      $("#dialog-diff").children().remove();
-      $("#dialog-btn-compare").off ("click");
-    };
-
     this.displayDiff = function (data) {
       $("#dialog-diff").children().remove();
       $("#dialog-diff").append (data);
@@ -180,17 +186,31 @@ var COTE = (function (C) {
 
     _content.keyup (function (e) {
       if (e.keyCode === 17) { _ctrl_down = false; }
-      //_doc.contentHandler (_content.val (), e);
+      _keyCode = null;
       self.highlightLine ();
       return false;
     });
 
     _content.keydown (function (e) {
       if (e.keyCode === 17) { _ctrl_down = true; }
-      if (e.keyCode === 83 && _ctrl_down) {
+      else if (e.keyCode === 83 && _ctrl_down) {
         _doc.saveButtonHandler ();
-        return false;
+        e.preventDefault ();
       }
+
+      var kc = e.keyCode;
+      if (kc === 37 || kc === 38 || kc === 39 || kc === 40) {
+        return;
+      }
+      if (kc === _keyCode) {
+        e.preventDefault ();
+      }
+      _keyCode = kc;
+
+    });
+
+    _content.click (function () {
+      self.highlightLine ();
     });
 
     _save_button.click (function (e) {
@@ -205,10 +225,11 @@ var COTE = (function (C) {
     });
 
     _chat_send.click (function (e) {
-      if (_chat_input.val () !== "") {
-        COTE.sendChatMessage (_chat_input.val ());
-        _chat_input.val ("");
+      var msg = $.trim (_chat_input.val ());
+      if (msg !== "") {
+        COTE.sendChatMessage (msg);
       }
+      _chat_input.val ("");
     });
 
     _chat_clear_history.click (function (e) {
@@ -244,9 +265,11 @@ var COTE = (function (C) {
           {
             text : "OK",
             click : function () {
-              if ($("#change-nick-value").val () !== "") {
-                COTE.changeEditorName ($("#change-nick-value").val ());
+              var name = $.trim ($("#change-nick-value").val ());
+              if (name !== "") {
+                COTE.changeEditorName (name);
                 $("#change-nick-value").val ("");
+                $("#chat-nick").text (name);
                 $(this).dialog ("close");
               }
             }
@@ -262,36 +285,80 @@ var COTE = (function (C) {
       });
     });
 
-    this.loadDialogBase = function () {
+    this.loadDialogBases = function () {
       $.get ("/dialog.html", function (data) {
-        _dialog_base = $(data);
+        _rev_dialog_base = $(data);
       });
       $.get ("/change_nick.html", function (data) {
         _change_nick_base = $(data);
       });
+      $.get ("/row_comment.html", function (data) {
+        _row_comment_base = $(data);
+      });
     }();
 
-    _content.focusin (function () {
+    /*_content.focusin (function () {
       //console.log("focus in");
       if (_interval_id !== null) { return; }
       _interval_id = setInterval (function () {
         _doc.contentHandler (_content.val ());
         //console.log ("update");
-      }, 750);
+      }, 1500);
     });
 
     _content.focusout (function () {
       //console.log("focus out");
       clearInterval (_interval_id);
       _interval_id = null;
-    });
+    });*/
+
+    setInterval (function () {
+      _doc.contentHandler (_content.val ());
+    }, 1500);
 
     _content.on ("copy paste cut", function (e) {
       e.preventDefault ();
       console.log ("copy || paste || cut detected");
     });
 
-  }
+    $(".lineno").hover (
+      function () {
+        $(this).append( $("<i>")
+          .addClass("icon-plus")
+          .attr("id", $(this).text())
+          .click(function () {
+            C.rowCommentHandler ($(this).attr ("id"));
+          })
+        );
+      },
+      function () {
+        $($(this).children()[0]).remove();
+      }
+    );
+
+    this.showCommentDialog = function (row_id, rowComment) {
+      var div = _row_comment_base;
+      div.dialog({
+        title : "Row comment",
+        width : 500,
+        height : 330,
+        resizable : false,
+        modal : true,
+        close : function () {
+        }
+      });
+      $("#dialog-header").text("");
+      $("#dialog-header")
+        .append("Add / edit comment for row <b>#" + row_id + "</b>.");
+      if (rowComment !== null) { $("#row-comment").val (rowComment); }
+      $("#comment-btn-cancel").click (function () { div.dialog ("close"); });
+    };
+
+    this.setEditorName = function (name) {
+      $("#chat-nick").text (name);
+    };
+
+  };
 
   return C;
 

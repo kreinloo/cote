@@ -6,10 +6,9 @@
 
 var COTE = (function (C) {
 
+  "use strict";
 
   C.Document = function () {
-
-    "use strict";
 
     var _id
       , _rev
@@ -22,12 +21,16 @@ var COTE = (function (C) {
     var _ui;
     var _is_saved = false;
 
+    var _content2 = [];
+    var _old_content = null;
+
     this.init = function (params) {
       _id         = params._id;
       _rev        = params._rev;
       _title      = params.title;
       _author     = params.author;
       _content    = params.content;
+      _old_content = params.content;
       _created_at = params.created_at;
       _updated_at = params.updated_at;
 
@@ -53,13 +56,14 @@ var COTE = (function (C) {
     };
 
     this.contentHandler = function (data, e) {
-      if (_content === data) { return; }
+      if (_old_content === data) { return; }
       if (COTE.docID === null) {
-        _content = data;
+        _old_content = data;
         return;
       }
-      var patches = COTE.patcher.patch_make (_content, data);
-      _content = data;
+      var patches = COTE.patcher.patch_make (_old_content, data);
+
+      _old_content = data;
       COTE.send (DOC.UPDATE, { type : "content", value : patches });
     };
 
@@ -68,7 +72,7 @@ var COTE = (function (C) {
         COTE.send (DOC.CREATE, {
           title : _title,
           author : _author,
-          content : _content,
+          content : _content
         });
       } else {
         COTE.send (DOC.SAVE, { id : _id });
@@ -87,13 +91,44 @@ var COTE = (function (C) {
         _ui.setAuthor (data.value);
       }
       else if (data.type === "content") {
-        var newContent = COTE.patcher.patch_apply (data.value, _content)[0];
+        var newContent = COTE.patcher.patch_apply (data.value, _ui.getContent ())[0];
         _content = newContent;
         _ui.setContent (newContent);
+        _old_content = _content;
       }
     };
 
-  }
+    this.contentHandler2 = function (data, e) {
+      /*
+      var i;
+      var content2 = data.split ("\n");
+      var len = content2.length > _content2.length ?
+        content2.length : _content2.length;
+      if (e.keyCode === 13 && _content2.length !== content2.length) {
+        for (i = 0; i < len; i++) {
+          if (_content2[i] !== content2[i] && content2[i] === "" &&
+              _content2[i] === content2[i+1]) {
+            console.log ("new line: " + i);
+            break;
+          }
+        }
+      }
+
+      else if (e.keyCode === 8 && _content2.length !== content2.length) {
+        for (i = 0; i < len; i++) {
+
+        }
+      }
+      _content2 = content2;
+      */
+    };
+
+    this.getCommentByRowId = function (row_id) {
+      // TODO
+      return null;
+    };
+
+  };
 
   return C;
 

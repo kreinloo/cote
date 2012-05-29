@@ -18,6 +18,8 @@ io.configure(function () {
 
 function Cote () {
 
+  "use strict";
+
   var docs = {};
   var self = this;
   var patcher = new gdiff ();
@@ -36,7 +38,7 @@ function Cote () {
       var doc = docs[id];
       if (doc === undefined) {
         docs[id] = {};
-        docs[id].editors = new Array ();
+        docs[id].editors = [];
       }
       docs[id].editors.push(socket);
 
@@ -76,7 +78,7 @@ function Cote () {
       if (!err) {
         db.get (body.id, function (err, res) {
           docs[body.id] = {};
-          docs[body.id].editors = new Array ();
+          docs[body.id].editors = [];
           docs[body.id].editors.push (socket);
           docs[body.id].doc = res;
           socket.emit (DOC.CREATE, res);
@@ -85,7 +87,7 @@ function Cote () {
       else {
         util.log(JSON.stringify(err));
       }
-    })
+    });
   };
 
   this.updateHandler = function (socket, data) {
@@ -180,16 +182,18 @@ function Cote () {
         var response = patcher.diff_prettyHtml (diffs);
         socket.emit (DOC.REV_DIFF, response);
         util.log ("DOC.REV_DIFF sent to " + socket.id);
-      })
+      });
     });
 
   };
 
-};
+}
 
 var cote = new Cote();
 
 io.sockets.on ("connection", function (socket) {
+
+  "use strict";
 
   socket.on (CLIENT.CONNECT, function (data) {
     cote.connectHandler(socket, data);
