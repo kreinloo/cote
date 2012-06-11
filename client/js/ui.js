@@ -33,8 +33,8 @@ var COTE = (function (C) {
     var _row_comment_base = null;
 
     var _interval_id = null;
-
     var _keyCode = null;
+    var _is_focused = false;
 
     var self = this;
 
@@ -60,12 +60,16 @@ var COTE = (function (C) {
       var substr2 = content.substr (0, caret);
       if (substr1 === substr2) {
         _content.val (content);
-        _content.caret (caret);
+        if (_is_focused) {
+          _content.caret (caret);
+        }
       }
       else {
         var diff = _content.val().length - content.length;
         _content.val (content);
-        _content.caret (caret - diff);
+        if (_is_focused) {
+          _content.caret (caret - diff);
+        }
       }
       self.highlightLine ();
     };
@@ -113,6 +117,7 @@ var COTE = (function (C) {
     };
 
     this.highlightLine = function () {
+      if (!_is_focused) { return; }
       var caret = _content.caret ();
       var slices = _content.val().split("\n");
       var count = 0;
@@ -232,19 +237,15 @@ var COTE = (function (C) {
     _rev_history.click (function (e) {
       COTE.revisionHandler ();
     });
-/*
-    $(document).keyup (function (e) {
-      if (e.which === 17) { _ctrl_down = false; }
+
+    _content.focusin (function (e) {
+      _is_focused = true;
     });
 
-    $(document).keydown (function (e) {
-      if (e.which === 17) { _ctrl_down = true; }
-      if (e.which === 83 && _ctrl_down) {
-        _doc.saveButtonHandler ();
-        return false;
-      }
-    });
-*/
+    _content.focusout (function (e) {
+      _is_focused = false;
+    })
+
     $("#chat-change-nick").click (function (e) {
       var div = _change_nick_base;
       div.dialog({
@@ -289,30 +290,12 @@ var COTE = (function (C) {
       });
     }();
 
-    /*_content.focusin (function () {
-      //console.log("focus in");
-      if (_interval_id !== null) { return; }
-      _interval_id = setInterval (function () {
-        _doc.contentHandler (_content.val ());
-        //console.log ("update");
-      }, 1500);
-    });
-
-    _content.focusout (function () {
-      //console.log("focus out");
-      clearInterval (_interval_id);
-      _interval_id = null;
-    });
-
-    setInterval (function () {
-      _doc.contentHandler ();
-    }, 1500);
-    */
     _content.on ("copy paste cut", function (e) {
       e.preventDefault ();
-      console.log ("copy || paste || cut detected");
+      //console.log ("copy || paste || cut detected");
     });
 
+    /*
     $(".lineno").hover (
       function () {
         $(this).append( $("<i>")
@@ -327,6 +310,7 @@ var COTE = (function (C) {
         $($(this).children()[0]).remove();
       }
     );
+    */
 
     this.showCommentDialog = function (row_id, rowComment) {
       var div = _row_comment_base;

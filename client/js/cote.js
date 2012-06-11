@@ -107,7 +107,7 @@ var COTE = (function (C) {
     if (C.socket !== undefined && C.docID !== null) {
       data.id = C.docID;
       C.socket.emit (ev, data);
-      console.log ("sent:" + JSON.stringify (data));
+      //console.log ("sent:" + JSON.stringify (data));
     } else {
       if (ev === DOC.CREATE) {
         C.socket.emit (ev, data);
@@ -137,7 +137,7 @@ var COTE = (function (C) {
     for (var r in revisions) {
       options.push (revisions[r].rev);
     }
-    console.log (options);
+    //console.log (options);
     C.ui.revisionDialog (options);
   };
 

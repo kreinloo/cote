@@ -122,3 +122,7 @@ select {
   width: 430px;
   font-family: monospace;
 }
+
+pre {
+  background-color: white;
+}

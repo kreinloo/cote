@@ -70,7 +70,7 @@ var COTE = (function (C) {
       if (_temp_diffs !== null) {
         while (_temp_diffs.length !== 0) {
           var v = _temp_diffs.splice (0, 1)[0];
-          console.log("v = " + JSON.stringify(v));
+          //console.log("v = " + JSON.stringify(v));
           COTE.send (DOC.UPDATE, {
             type : "content",
             value : v
@@ -115,38 +115,13 @@ var COTE = (function (C) {
           else {
             _temp_diffs.push (diffs);
           }
-          console.log("\nmaking temp diffs!\n");
+          //console.log("\nmaking temp diffs!\n");
         }
         var newContent = COTE.patcher.patch_apply (data.value, _ui.getContent ())[0];
         _content = newContent;
         _ui.setContent (newContent);
         _old_content = _content;
       }
-    };
-
-    this.contentHandler2 = function (data, e) {
-      /*
-      var i;
-      var content2 = data.split ("\n");
-      var len = content2.length > _content2.length ?
-        content2.length : _content2.length;
-      if (e.keyCode === 13 && _content2.length !== content2.length) {
-        for (i = 0; i < len; i++) {
-          if (_content2[i] !== content2[i] && content2[i] === "" &&
-              _content2[i] === content2[i+1]) {
-            console.log ("new line: " + i);
-            break;
-          }
-        }
-      }
-
-      else if (e.keyCode === 8 && _content2.length !== content2.length) {
-        for (i = 0; i < len; i++) {
-
-        }
-      }
-      _content2 = content2;
-      */
     };
 
     this.getCommentByRowId = function (row_id) {
