@@ -186,7 +186,7 @@ var COTE = (function (C) {
 
     _content.keyup (function (e) {
       if (e.keyCode === 17) { _ctrl_down = false; }
-      _keyCode = null;
+      _doc.contentHandler ();
       self.highlightLine ();
       return false;
     });
@@ -196,17 +196,9 @@ var COTE = (function (C) {
       else if (e.keyCode === 83 && _ctrl_down) {
         _doc.saveButtonHandler ();
         e.preventDefault ();
-      }
-
-      var kc = e.keyCode;
-      if (kc === 37 || kc === 38 || kc === 39 || kc === 40) {
         return;
       }
-      if (kc === _keyCode) {
-        e.preventDefault ();
-      }
-      _keyCode = kc;
-
+      _doc.contentHandler ();
     });
 
     _content.click (function () {
@@ -310,12 +302,12 @@ var COTE = (function (C) {
       //console.log("focus out");
       clearInterval (_interval_id);
       _interval_id = null;
-    });*/
+    });
 
     setInterval (function () {
-      _doc.contentHandler (_content.val ());
+      _doc.contentHandler ();
     }, 1500);
-
+    */
     _content.on ("copy paste cut", function (e) {
       e.preventDefault ();
       console.log ("copy || paste || cut detected");

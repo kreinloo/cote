@@ -68,7 +68,7 @@ var COTE = (function (C) {
     C.socket.on (DOC.SAVE, function (data) {
       console.log ("recv: DOC.SAVE " + JSON.stringify (data));
       self.ui.popupMessage ("Document saved!");
-      self.ui.setUpdatedAt ( data.timestamp );
+      self.ui.setUpdatedAt (data.timestamp);
     });
 
     C.socket.on (CLIENT.NAME, function (data) {

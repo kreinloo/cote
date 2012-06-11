@@ -6,15 +6,10 @@
 var io        = require("socket.io").listen(8002);
 var util      = require("util");
 var gdiff     = require("googlediff");
-var sanitizer = require ("sanitizer");
+var sanitizer = require("sanitizer");
 var nano      = require("nano")("http://localhost:5984");
 var events    = require("../client/js/events.js");
-
 var db        = nano.use("cote");
-
-io.configure(function () {
-  io.set ("log level", 2);
-});
 
 function Cote () {
 
@@ -22,7 +17,7 @@ function Cote () {
 
   var docs = {};
   var self = this;
-  var patcher = new gdiff ();
+  var dmp = new gdiff ();
 
   this.connectHandler = function (socket, data) {
     util.log("CLIENT.CONNECT from " + socket.id + " " + JSON.stringify(data));
@@ -107,7 +102,15 @@ function Cote () {
     }
     else if (data.type === "content") {
       var content = docs[data.id].doc.content;
-      content = patcher.patch_apply (data.value, content)[0];
+      var diff = dmp.patch_apply (data.value, content);
+      content = diff[0];
+      /**
+      console.log("---");
+      console.log(JSON.stringify (data.value));
+      console.log("---");
+      console.log(JSON.stringify (diff));
+      console.log("---\n");
+      */
       docs[data.id].doc.content = content;
     }
     for (i = 0; i < editors.length; i++) {
@@ -177,19 +180,22 @@ function Cote () {
         if (err2) { return; }
         var text1 = res1.content;
         var text2 = res2.content;
-        var diffs = patcher.diff_main (text1, text2);
-        patcher.diff_cleanupSemantic (diffs);
-        var response = patcher.diff_prettyHtml (diffs);
+        var diffs = dmp.diff_main (text1, text2);
+        dmp.diff_cleanupSemantic (diffs);
+        var response = dmp.diff_prettyHtml (diffs);
         socket.emit (DOC.REV_DIFF, response);
         util.log ("DOC.REV_DIFF sent to " + socket.id);
       });
     });
-
   };
 
 }
 
-var cote = new Cote();
+var cote = new Cote ();
+
+io.configure (function () {
+  io.set ("log level", 2);
+});
 
 io.sockets.on ("connection", function (socket) {
 
@@ -228,4 +234,3 @@ io.sockets.on ("connection", function (socket) {
   });
 
 });
-

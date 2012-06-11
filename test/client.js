@@ -11,7 +11,6 @@ io.emit (CLIENT.CONNECT, { id : docID });
 var content;
 
 io.on (DOC.INIT, function (data) {
-  var res = JSON.stringify (data);
   content = data.content;
   console.log (content);
 });
@@ -21,6 +20,7 @@ io.on (DOC.UPDATE, function (data) {
   if (data.type === "content") {
     var newContent = patcher.patch_apply (data.value, content)[0];
     content = newContent;
+    console.log (content);
   }
 });
 
@@ -32,10 +32,9 @@ setInterval (function () {
     cntnt[0] = "foo ";
   }
   else { cntnt[0] = cntnt[0] + "f" };
-
   cntnt = cntnt.join ("\n");
   var patches = patcher.patch_make (content, cntnt);
   content = cntnt;
   io.emit (DOC.UPDATE, { type : "content", value : patches, id : docID });
 
-}, 1500);
+}, 500);
