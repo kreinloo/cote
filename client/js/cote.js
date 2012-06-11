@@ -48,7 +48,7 @@ var COTE = (function (C) {
     var self = C;
 
     C.socket.on (DOC.CREATE, function (data) {
-      console.log ("recv: DOC.CREATE " + JSON.stringify (data));
+      //console.log ("recv: DOC.CREATE " + JSON.stringify (data));
       self.docID = data._id;
       self.saveDocParams (data._id);
       self.ui.popupMessage ("Document created!");
@@ -56,39 +56,39 @@ var COTE = (function (C) {
     });
 
     C.socket.on (DOC.INIT, function (data) {
-      console.log ("recv: DOC.INIT " + JSON.stringify (data));
+      //console.log ("recv: DOC.INIT " + JSON.stringify (data));
       self.doc.init (data);
     });
 
     C.socket.on (DOC.UPDATE, function (data) {
-      console.log ("recv: DOC.UPDATE " + JSON.stringify (data));
+      //console.log ("recv: DOC.UPDATE " + JSON.stringify (data));
       self.doc.serverUpdate (data);
     });
 
     C.socket.on (DOC.SAVE, function (data) {
-      console.log ("recv: DOC.SAVE " + JSON.stringify (data));
+      //console.log ("recv: DOC.SAVE " + JSON.stringify (data));
       self.ui.popupMessage ("Document saved!");
       self.ui.setUpdatedAt (data.timestamp);
     });
 
     C.socket.on (CLIENT.NAME, function (data) {
-      console.log ("recv: " + CLIENT.NAME + " " + data);
+      //console.log ("recv: " + CLIENT.NAME + " " + data);
       self.editorName = data;
       self.ui.setEditorName (data);
     });
 
     C.socket.on (CHAT.MESSAGE, function (data) {
-      console.log ("recv: " + CHAT.MESSAGE + " " + JSON.stringify (data));
+      //console.log ("recv: " + CHAT.MESSAGE + " " + JSON.stringify (data));
       self.ui.addChatMessage (data);
     });
 
     C.socket.on (DOC.REV_INFO, function (data) {
-      console.log ("recv: " + DOC.REV_INFO + " " + JSON.stringify (data));
+      //console.log ("recv: " + DOC.REV_INFO + " " + JSON.stringify (data));
       self.revisionResponseHandler (data);
     });
 
     C.socket.on (DOC.REV_DIFF, function (data) {
-      console.log ("recv: " + DOC.REV_DIFF + " " + JSON.stringify (data));
+      //console.log ("recv: " + DOC.REV_DIFF + " " + JSON.stringify (data));
       self.revDiffResponseHandler (data);
     });
 

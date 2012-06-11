@@ -68,7 +68,14 @@ var COTE = (function (C) {
       _old_content = data;
 
       if (_temp_diffs !== null) {
-        COTE.send (DOC.UPDATE, { type : "content", value : _temp_diffs });
+        while (_temp_diffs.length !== 0) {
+          var v = _temp_diffs.splice (0, 1)[0];
+          console.log("v = " + JSON.stringify(v));
+          COTE.send (DOC.UPDATE, {
+            type : "content",
+            value : v
+          });
+        }
         _temp_diffs = null;
       }
       COTE.send (DOC.UPDATE, { type : "content", value : patches });
@@ -79,7 +86,7 @@ var COTE = (function (C) {
         COTE.send (DOC.CREATE, {
           title : _title,
           author : _author,
-          content : _content
+          content : _ui.getContent ()
         });
       } else {
         COTE.send (DOC.SAVE, { id : _id });
@@ -98,16 +105,18 @@ var COTE = (function (C) {
         _ui.setAuthor (data.value);
       }
       else if (data.type === "content") {
-
         var content = _ui.getContent ();
         if (_old_content !== content) {
-          _temp_diffs = COTE.patcher.patch_make (_old_content, content);
+          var diffs = COTE.patcher.patch_make (_old_content, content);
+          if (_temp_diffs === null) {
+            _temp_diffs = [];
+            _temp_diffs.push (diffs);
+          }
+          else {
+            _temp_diffs.push (diffs);
+          }
           console.log("\nmaking temp diffs!\n");
         }
-        else {
-          _temp_diffs = null;
-        }
-
         var newContent = COTE.patcher.patch_apply (data.value, _ui.getContent ())[0];
         _content = newContent;
         _ui.setContent (newContent);

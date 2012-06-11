@@ -102,15 +102,9 @@ function Cote () {
     }
     else if (data.type === "content") {
       var content = docs[data.id].doc.content;
+      console.log (JSON.stringify(data.value));
       var diff = dmp.patch_apply (data.value, content);
       content = diff[0];
-      /**
-      console.log("---");
-      console.log(JSON.stringify (data.value));
-      console.log("---");
-      console.log(JSON.stringify (diff));
-      console.log("---\n");
-      */
       docs[data.id].doc.content = content;
     }
     for (i = 0; i < editors.length; i++) {
@@ -120,9 +114,7 @@ function Cote () {
   };
 
   this.saveHandler = function (socket, data) {
-    if (data.id === undefined) {
-      return;
-    }
+    if (data.id === undefined) { return; }
     if (docs[data.id] === undefined) { return; }
     var timestamp = new Date ().toString ();
     docs[data.id].doc.updated_at = timestamp;
