@@ -290,28 +290,6 @@ var COTE = (function (C) {
       });
     }();
 
-    _content.on ("copy paste cut", function (e) {
-      e.preventDefault ();
-      //console.log ("copy || paste || cut detected");
-    });
-
-    /*
-    $(".lineno").hover (
-      function () {
-        $(this).append( $("<i>")
-          .addClass("icon-plus")
-          .attr("id", $(this).text())
-          .click(function () {
-            C.rowCommentHandler ($(this).attr ("id"));
-          })
-        );
-      },
-      function () {
-        $($(this).children()[0]).remove();
-      }
-    );
-    */
-
     this.showCommentDialog = function (row_id, rowComment) {
       var div = _row_comment_base;
       div.dialog({

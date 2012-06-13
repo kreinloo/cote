@@ -37,7 +37,6 @@ var COTE = (function (C) {
       _updated_at = params.updated_at;
 
       _ui.setID (_id);
-      //_ui.setRev (_rev);
       _ui.setTitle (_title);
       _ui.setAuthor (_author);
       _ui.setContent (_content);
@@ -70,7 +69,6 @@ var COTE = (function (C) {
       if (_temp_diffs !== null) {
         while (_temp_diffs.length !== 0) {
           var v = _temp_diffs.splice (0, 1)[0];
-          //console.log("v = " + JSON.stringify(v));
           COTE.send (DOC.UPDATE, {
             type : "content",
             value : v
@@ -115,7 +113,6 @@ var COTE = (function (C) {
           else {
             _temp_diffs.push (diffs);
           }
-          //console.log("\nmaking temp diffs!\n");
         }
         var newContent = COTE.patcher.patch_apply (data.value, _ui.getContent ())[0];
         _content = newContent;
