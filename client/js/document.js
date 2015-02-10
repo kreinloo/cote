@@ -27,14 +27,14 @@ var COTE = (function (C) {
     var _temp_diffs = null;
 
     this.init = function (params) {
-      _id         = params._id;
-      _rev        = params._rev;
-      _title      = params.title;
-      _author     = params.author;
-      _content    = params.content;
+      _id          = params._id;
+      _rev         = params._rev;
+      _title       = params.title;
+      _author      = params.author;
+      _content     = params.content;
       _old_content = params.content;
-      _created_at = params.created_at;
-      _updated_at = params.updated_at;
+      _created_at  = params.created_at;
+      _updated_at  = params.updated_at;
 
       _ui.setID (_id);
       _ui.setTitle (_title);

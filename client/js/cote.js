@@ -168,11 +168,11 @@ var COTE = (function (C) {
 $(document).ready(function () {
 
   $("#doc-content").tabby();
-  $("#doc-content").linedtextarea ();
+  $("#doc-content").linedtextarea();
 
-  COTE.doc = new COTE.Document ();
-  COTE.ui = new COTE.UI (COTE.doc);
-  COTE.doc.setUI (COTE.ui);
+  COTE.doc = new COTE.Document();
+  COTE.ui = new COTE.UI( COTE.doc );
+  COTE.doc.setUI( COTE.ui );
   COTE.init();
 
 });
